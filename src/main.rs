@@ -47,8 +47,20 @@ fn main() -> std::io::Result<()>
     let v3 = &v1 + &v2;
     let v4 = &v1 - &v2;
 
-    dbg!(v3);
-    dbg!(v4);
+    dbg!(&v3);
+    dbg!(&v4);
+
+    v1 += &v3;
+
+    dbg!(&v1);
+
+    v1 *= 5i8;
+
+    dbg!(&v1);
+
+    v1 /= 4i8;
+
+    dbg!(&v1);
 
     Ok(())
 }

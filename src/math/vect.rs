@@ -1,33 +1,33 @@
 use std::ops::*;
+use std::convert::Into;
 
-pub trait VectorableType<T> :
+pub trait VectorableType :
     Default +
     Copy +
-    Add<Output = T> +
-    Sub<Output = T> {}
+    Add<Output = Self> +
+    Sub<Output = Self> +
+    Mul<Output = Self> +
+    Div<Output = Self> +
+    Into<f64> {}
 
-impl VectorableType<u8> for u8 {}
-impl VectorableType<u16> for u16 {}
-impl VectorableType<u32> for u32 {}
-impl VectorableType<u64> for u64 {}
-impl VectorableType<usize> for usize {}
+impl VectorableType for u8 {}
+impl VectorableType for u16 {}
+impl VectorableType for u32 {}
 
-impl VectorableType<i8> for i8 {}
-impl VectorableType<i16> for i16 {}
-impl VectorableType<i32> for i32 {}
-impl VectorableType<i64> for i64 {}
-impl VectorableType<isize> for isize {}
+impl VectorableType for i8 {}
+impl VectorableType for i16 {}
+impl VectorableType for i32 {}
 
-impl VectorableType<f32> for f32 {}
-impl VectorableType<f64> for f64 {}
+impl VectorableType for f32 {}
+impl VectorableType for f64 {}
 
 #[derive(Debug)]
-pub struct Vect<const COUNT: usize, T: VectorableType<T>>
+pub struct Vect<const COUNT: usize, T: VectorableType>
 {
     data: [T; COUNT],
 }
 
-impl<const COUNT: usize, T: VectorableType<T>> Vect<COUNT, T>
+impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
 {
     pub fn new() -> Self
     {
@@ -40,7 +40,7 @@ impl<const COUNT: usize, T: VectorableType<T>> Vect<COUNT, T>
 
 // Non-mutable Accessor:
 
-impl<const COUNT: usize, T: VectorableType<T>> Index<usize> for Vect<COUNT, T>
+impl<const COUNT: usize, T: VectorableType> Index<usize> for Vect<COUNT, T>
 {
     type Output = T;
 
@@ -52,7 +52,7 @@ impl<const COUNT: usize, T: VectorableType<T>> Index<usize> for Vect<COUNT, T>
 
 // Mutable Accessor:
 
-impl<const COUNT: usize, T: VectorableType<T>> IndexMut<usize> for Vect<COUNT, T>
+impl<const COUNT: usize, T: VectorableType> IndexMut<usize> for Vect<COUNT, T>
 {
     fn index_mut(&mut self, ind: usize) -> &mut Self::Output
     {
@@ -62,7 +62,7 @@ impl<const COUNT: usize, T: VectorableType<T>> IndexMut<usize> for Vect<COUNT, T
 
 // Convenience Operator Overloads:
 
-impl<'a, 'b, const COUNT: usize, T: VectorableType<T>> Add<&'b Vect::<COUNT, T>> for &'a Vect<COUNT, T>
+impl<'a, 'b, const COUNT: usize, T: VectorableType> Add<&'b Vect::<COUNT, T>> for &'a Vect<COUNT, T>
 {
     type Output = Vect<COUNT, T>;
 
@@ -77,7 +77,7 @@ impl<'a, 'b, const COUNT: usize, T: VectorableType<T>> Add<&'b Vect::<COUNT, T>>
     }
 }
 
-impl<'a, 'b, const COUNT: usize, T: VectorableType<T>> Sub<&'b Vect::<COUNT, T>> for &'a Vect<COUNT, T>
+impl<'a, 'b, const COUNT: usize, T: VectorableType> Sub<&'b Vect::<COUNT, T>> for &'a Vect<COUNT, T>
 {
     type Output = Vect<COUNT, T>;
 
@@ -92,3 +92,96 @@ impl<'a, 'b, const COUNT: usize, T: VectorableType<T>> Sub<&'b Vect::<COUNT, T>>
     }
 }
 
+impl<'a, const COUNT: usize, T: VectorableType> AddAssign<&'a Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    fn add_assign(&mut self, other: &'a Vect::<COUNT, T>)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] + other[ind];
+        }
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> SubAssign<&'a Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    fn sub_assign(&mut self, other: &'a Vect::<COUNT, T>)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] - other[ind];
+        }
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Mul<T> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(self, other: T) -> Self::Output
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = self.data[ind] * other;
+        }
+        result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> MulAssign<T> for Vect<COUNT, T>
+{
+    fn mul_assign(&mut self, other: T)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] * other;
+        }
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Div<T> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(self, other: T) -> Self::Output
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = self.data[ind] / other;
+        }
+        result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> DivAssign<T> for Vect<COUNT, T>
+{
+    fn div_assign(&mut self, other: T)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] / other;
+        }
+    }
+}
+
+// Length Calculations
+
+impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
+{
+    pub fn length_squared (&self) -> f64
+    {
+        let mut result = 0f64;
+        for ind in 0..COUNT
+        {
+            result += (self.data[ind] * self.data[ind]).into();
+        }
+        result
+    }
+
+    pub fn length (&self) -> f64
+    {
+        self.length_squared().sqrt()
+    }
+}
