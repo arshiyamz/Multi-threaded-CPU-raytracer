@@ -44,3 +44,51 @@ impl Ray
         &self.origin + &(t * &self.direction)
     }
 }
+
+
+//============================================
+//============================================
+//===============Unit Tests===================
+//============================================
+//============================================
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn creation_test()
+    {
+        let r = Ray::default();
+        assert_eq!(r, Ray
+                        {
+                            origin: Point{data: [0f64, 0f64, 0f64]},
+                            direction: Vect{data: [1f64, 0f64, 0f64]},
+                        });
+
+        let u = Vect{data:[1f64, 2f64, 3f64]};
+        let v = Vect{data:[4f64, 5f64, 6f64]};
+        let r = Ray::new(&u, &v);
+        assert_eq!(r, Ray
+                        {
+                            origin: Point{data: [1f64, 2f64, 3f64]},
+                            direction: Vect{data: [4f64, 5f64, 6f64]},
+                        });
+        let r = Ray::make_new(u, v);
+        assert_eq!(r, Ray
+            {
+                origin: Point{data: [1f64, 2f64, 3f64]},
+                direction: Vect{data: [4f64, 5f64, 6f64]},
+            });
+    }
+
+    #[test]
+    fn at_test()
+    {
+        let u = Vect{data:[1f64, 2f64, 3f64]};
+        let v = Vect{data:[4f64, 5f64, 6f64]};
+        let r = Ray::new(&u, &v);
+        assert_eq!(r.at(2f64), Vect{data:[9f64, 12f64, 15f64]});
+    }
+}
