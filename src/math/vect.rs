@@ -1,9 +1,11 @@
+use std::fmt;
 use std::ops::*;
 use std::convert::Into;
 
 pub trait VectorableType :
     Default +
     Copy +
+    fmt::Display +
     Add<Output = Self> +
     Sub<Output = Self> +
     Mul<Output = Self> +
@@ -22,7 +24,7 @@ impl VectorableType for f32 {}
 impl VectorableType for f64 {}
 
 #[derive(Debug)]
-pub struct Vect<const COUNT: usize, T: VectorableType>
+pub struct Vect<const COUNT: usize = 3, T: VectorableType = f64>
 {
     data: [T; COUNT],
 }
@@ -35,6 +37,18 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
         {
            data: [T::default(); COUNT],
         }
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> fmt::Display for Vect<COUNT, T>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    {
+        for ind in 0..(COUNT-1)
+        {
+            write!(f, "{} ", self.data[ind])?;
+        }
+        write!(f, "{}", self.data[COUNT-1])
     }
 }
 
@@ -129,6 +143,33 @@ impl<'a, const COUNT: usize, T: VectorableType> Mul<T> for &'a Vect<COUNT, T>
     }
 }
 
+macro_rules! impl_vect_mul
+{
+    ( $T:ty ) =>
+    {
+        impl<'a, const COUNT: usize> Mul<&'a Vect<COUNT, $T>> for $T
+        {
+            type Output = Vect<COUNT, $T>;
+
+            fn mul(self, other: &'a Vect<COUNT, $T>) -> Self::Output
+            {
+                other * self
+            }
+        }
+    }
+}
+
+impl_vect_mul!(u8);
+impl_vect_mul!(u16);
+impl_vect_mul!(u32);
+
+impl_vect_mul!(i8);
+impl_vect_mul!(i16);
+impl_vect_mul!(i32);
+
+impl_vect_mul!(f32);
+impl_vect_mul!(f64);
+
 impl<'a, const COUNT: usize, T: VectorableType> MulAssign<T> for Vect<COUNT, T>
 {
     fn mul_assign(&mut self, other: T)
@@ -154,6 +195,38 @@ impl<'a, const COUNT: usize, T: VectorableType> Div<T> for &'a Vect<COUNT, T>
         result
     }
 }
+
+macro_rules! impl_vect_div
+{
+    ( $T:ty ) =>
+    {
+        impl<'a, const COUNT: usize> Div<&'a Vect<COUNT, $T>> for $T
+        {
+            type Output = Vect<COUNT, $T>;
+
+            fn div(self, other: &'a Vect<COUNT, $T>) -> Self::Output
+            {
+                let mut result = Vect::<COUNT, $T>::new();
+                for ind in 0..COUNT
+                {
+                    result[ind] = self / other[ind];
+                }
+                result
+            }
+        }
+    }
+}
+
+impl_vect_div!(u8);
+impl_vect_div!(u16);
+impl_vect_div!(u32);
+
+impl_vect_div!(i8);
+impl_vect_div!(i16);
+impl_vect_div!(i32);
+
+impl_vect_div!(f32);
+impl_vect_div!(f64);
 
 impl<'a, const COUNT: usize, T: VectorableType> DivAssign<T> for Vect<COUNT, T>
 {
@@ -183,5 +256,41 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
     pub fn length (&self) -> f64
     {
         self.length_squared().sqrt()
+    }
+
+    pub fn dot_with (&self, other: Vect<COUNT, T>) -> T
+    {
+        self[0] * other[0] +
+        self[1] * other[1] +
+        self[2] * other[2]
+    }
+
+    pub fn dot (u: Vect<COUNT, T>, v: Vect<COUNT, T>) -> T
+    {
+        u[0] * v[0] +
+        u[1] * v[1] +
+        u[2] * v[2]
+    }
+}
+
+impl<const COUNT: usize> Vect<COUNT, f64>
+{
+    pub fn normalize(&mut self)
+    {
+        *self /= self.length();
+    }
+}
+
+
+impl<T: VectorableType> Vect<3, T>
+{
+    pub fn cross(u: &Vect<3, T>, v: &Vect<3, T>) -> Vect<3, T>
+    {
+        Vect::<3, T>
+        {
+            data: [u[1] * v[2] - u[2] * v[1],
+                u[2] * v[0] - u[0] * v[2],
+                u[0] * v[1] - u[1] * v[0]],
+        }
     }
 }

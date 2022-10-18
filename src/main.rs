@@ -9,8 +9,10 @@ const PROJECT_PATH: &str = env!("CARGO_MANIFEST_DIR");
 const IMAGE_OUT_PATH: &str = "out/output.ppm";
 
 mod math;
+mod utils;
 
 use math::vect::Vect;
+use utils::color::Color;
 
 fn main() -> std::io::Result<()>
 {
@@ -54,13 +56,35 @@ fn main() -> std::io::Result<()>
 
     dbg!(&v1);
 
-    v1 *= 5i8;
+    v1 = 5i8 * &v1;
 
     dbg!(&v1);
 
     v1 /= 4i8;
 
     dbg!(&v1);
+
+    let mut v5 = Vect::<3, i8>::new();
+    let mut v6 = Vect::<3, i8>::new();
+    
+    v5[0] = 1;
+    v5[1] = 2;
+    v5[2] = 3;
+    v6[0] = 4;
+    v6[1] = 5;
+    v6[2] = 6;
+
+    dbg!(Vect::cross(&v5, &v6));
+
+    println!("{}", &v6);
+
+    let mut c = Color::new(10, 20, 30);
+
+    c.r = 2;
+    c.g = 100;
+    c.b = 200;
+
+    println!("{}", &c);
 
     Ok(())
 }
