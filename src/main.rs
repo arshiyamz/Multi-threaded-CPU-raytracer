@@ -27,64 +27,16 @@ fn main() -> std::io::Result<()>
     {
         for width_iterator in 0..RENDER_WIDTH
         {
-            let r: u8 = (255f32 * (width_iterator as f32 / (RENDER_WIDTH - 1) as f32)) as u8;
-            let g: u8 = (255f32 * (height_iterator as f32 / (RENDER_HEIGHT - 1) as f32)) as u8;
-            let b = 64u8;
+            let c = Color::new
+            (
+                (255f32 * (width_iterator as f32 / (RENDER_WIDTH - 1) as f32)) as u8,
+                (255f32 * (height_iterator as f32 / (RENDER_HEIGHT - 1) as f32)) as u8,
+                64u8
+            );
 
-            file.write_all(format!("{} {} {}\n", r, g, b).as_bytes())?;
+            file.write_all(format!("{}", c).as_bytes())?;
         }
     }
-
-    let mut v1 = Vect::<2, i8>::new();
-    let mut v2 = Vect::<2, i8>::new();
-    
-    v1[0] = 1;
-    v1[1] = 2;
-    v2[0] = 3;
-    v2[1] = 4;
-
-    v1 = dbg!(v1);
-    v2 = dbg!(v2);
-
-    let v3 = &v1 + &v2;
-    let v4 = &v1 - &v2;
-
-    dbg!(&v3);
-    dbg!(&v4);
-
-    v1 += &v3;
-
-    dbg!(&v1);
-
-    v1 = 5i8 * &v1;
-
-    dbg!(&v1);
-
-    v1 /= 4i8;
-
-    dbg!(&v1);
-
-    let mut v5 = Vect::<3, i8>::new();
-    let mut v6 = Vect::<3, i8>::new();
-    
-    v5[0] = 1;
-    v5[1] = 2;
-    v5[2] = 3;
-    v6[0] = 4;
-    v6[1] = 5;
-    v6[2] = 6;
-
-    dbg!(Vect::cross(&v5, &v6));
-
-    println!("{}", &v6);
-
-    let mut c = Color::new(10, 20, 30);
-
-    c.r = 2;
-    c.g = 100;
-    c.b = 200;
-
-    println!("{}", &c);
 
     Ok(())
 }

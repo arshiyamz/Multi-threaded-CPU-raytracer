@@ -23,10 +23,10 @@ impl VectorableType for i32 {}
 impl VectorableType for f32 {}
 impl VectorableType for f64 {}
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Vect<const COUNT: usize = 3, T: VectorableType = f64>
 {
-    data: [T; COUNT],
+    pub data: [T; COUNT],
 }
 
 impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
@@ -36,6 +36,27 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
         Vect::<COUNT, T>
         {
            data: [T::default(); COUNT],
+        }
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Clone for Vect<COUNT, T>
+{
+    fn clone(&self) -> Self
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = self.data[ind];
+        }
+        result
+    }
+
+    fn clone_from(&mut self, source: &Self)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = source[ind];
         }
     }
 }
@@ -125,6 +146,21 @@ impl<'a, const COUNT: usize, T: VectorableType> SubAssign<&'a Vect::<COUNT, T>> 
         {
             self.data[ind] = self.data[ind] - other[ind];
         }
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType + Neg<Output = T>> Neg for &Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn neg(self) -> Self::Output
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = -self.data[ind];
+        }
+        result
     }
 }
 
@@ -258,14 +294,14 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
         self.length_squared().sqrt()
     }
 
-    pub fn dot_with (&self, other: Vect<COUNT, T>) -> T
+    pub fn dot_with (&self, other: &Vect<COUNT, T>) -> T
     {
         self[0] * other[0] +
         self[1] * other[1] +
         self[2] * other[2]
     }
 
-    pub fn dot (u: Vect<COUNT, T>, v: Vect<COUNT, T>) -> T
+    pub fn dot (u: &Vect<COUNT, T>, v: &Vect<COUNT, T>) -> T
     {
         u[0] * v[0] +
         u[1] * v[1] +
@@ -273,11 +309,21 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
     }
 }
 
-impl<const COUNT: usize> Vect<COUNT, f64>
+impl<const COUNT: usize, T: VectorableType + From<f64>> Vect<COUNT, T>
 {
     pub fn normalize(&mut self)
     {
-        *self /= self.length();
+        *self /= T::from(self.length());
+    }
+
+    pub fn get_normalized(&self) -> Vect<COUNT, T>
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = self.data[ind] / T::from(self.length());
+        }
+        result
     }
 }
 
@@ -292,5 +338,107 @@ impl<T: VectorableType> Vect<3, T>
                 u[2] * v[0] - u[0] * v[2],
                 u[0] * v[1] - u[1] * v[0]],
         }
+    }
+}
+
+//============================================
+//============================================
+//===============Unit Tests===================
+//============================================
+//============================================
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn creation_test()
+    {
+        let vec_default = Vect::new();
+        assert_eq!(vec_default, Vect::<3, f64>{data: [0f64; 3]});
+
+        let _vec_u8 = Vect::<5, u8>::new();
+        let _vec_u16 = Vect::<5, u16>::new();
+        let _vec_u32 = Vect::<5, u32>::new();
+
+        let _vec_i8 = Vect::<5, i8>::new();
+        let _vec_i16 = Vect::<5, i16>::new();
+        let _vec_i32 = Vect::<5, i32>::new();
+
+        let _vec_f32 = Vect::<5, f32>::new();
+        let _vec_f64 = Vect::<5, f64>::new();
+    }
+
+    #[test]
+    fn display_test()
+    {
+        let vec = Vect::<7, u8>{data:[1, 2, 3, 4, 5, 6, 7]};
+        assert_eq!(format!("{}", vec), "1 2 3 4 5 6 7");
+    }
+
+    #[test]
+    fn operations_test()
+    {
+        let u = Vect{data:[1f64, 2f64, 3f64]};
+        let v = Vect{data:[4f64, 5f64, 6f64]};
+
+        assert_eq!(&u + &v, Vect{data:[5f64, 7f64, 9f64]});
+        assert_eq!(&v + &u, Vect{data:[5f64, 7f64, 9f64]});
+
+        assert_eq!(&u - &v, Vect{data:[-3f64, -3f64, -3f64]});
+        assert_eq!(&v - &u, Vect{data:[3f64, 3f64, 3f64]});
+
+        assert_eq!(-&u, Vect{data:[-1f64, -2f64, -3f64]});
+
+        assert_eq!(5f64 * &u, Vect{data:[5f64, 10f64, 15f64]});
+        assert_eq!(&u * 5f64, Vect{data:[5f64, 10f64, 15f64]});
+
+        let mut m = Vect{data:[1f64, 2f64, 3f64]};
+        m *= 5f64;
+        assert_eq!(m, Vect{data:[5f64, 10f64, 15f64]});
+
+        let mut m = Vect{data:[2f64, 4f64, 6f64]};
+        assert_eq!(0f64 / &m, Vect{data:[0f64, 0f64, 0f64]});
+        assert_eq!(&m / 2f64, Vect{data:[1f64, 2f64, 3f64]});
+        m /= 2f64;
+        assert_eq!(m, Vect{data:[1f64, 2f64, 3f64]});
+
+        assert_eq!(Vect::dot(&u, &v), 32f64);
+        assert_eq!(u.dot_with(&v), 32f64);
+        assert_eq!(v.dot_with(&u), 32f64);
+        assert_eq!(Vect::cross(&u, &v), Vect{data:[-3f64, 6f64, -3f64]});
+
+        let mut m = Vect{data:[1f64, 0f64, 0f64]};
+        assert_eq!(m.get_normalized(), Vect{data:[1f64, 0f64, 0f64]});
+        m.normalize();
+        assert_eq!(m, Vect{data:[1f64, 0f64, 0f64]});
+
+        assert_eq!(u.length_squared(), 14f64);
+        let m = Vect{data:[1f64, 0f64, 0f64]};
+        assert_eq!(m.length(), 1f64);
+    }
+
+    #[test]
+    fn accessors_test()
+    {
+        let u = Vect{data:[1f64, 2f64, 3f64]};
+        let mut v = Vect{data:[4f64, 5f64, 6f64]};
+
+        assert_eq!(u[0], 1f64);
+        assert_eq!(u[1], 2f64);
+        assert_eq!(u[2], 3f64);
+
+        assert_eq!(v[0], 4f64);
+        assert_eq!(v[1], 5f64);
+        assert_eq!(v[2], 6f64);
+
+        v[0] = 1f64;
+        v[1] = 2f64;
+        v[2] = 3f64;
+
+        assert_eq!(v[0], 1f64);
+        assert_eq!(v[1], 2f64);
+        assert_eq!(v[2], 3f64);
     }
 }

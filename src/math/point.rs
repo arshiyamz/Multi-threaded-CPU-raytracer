@@ -1,0 +1,1 @@
+pub use super::vect::Vect as Point;

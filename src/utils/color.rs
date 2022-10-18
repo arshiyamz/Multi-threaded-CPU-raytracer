@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Color
 {
     pub r: u8,
@@ -25,6 +25,50 @@ impl Color
             g,
             b,
         }
+    }
+
+    pub fn r(&self) -> u8
+    {
+        self.r
+    }
+
+    pub fn g(&self) -> u8
+    {
+        self.g
+    }
+
+    pub fn b(&self) -> u8
+    {
+        self.b
+    }
+}
+
+//============================================
+//============================================
+//===============Unit Tests===================
+//============================================
+//============================================
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn creation_test()
+    {
+        let c = Color::new(10, 20, 30);
+        assert_eq!(c, Color{r:10, g:20, b:30});
+    }
+
+    #[test]
+    fn mutate_test()
+    {
+        let mut c = Color::new(10, 20, 30);
+        c.r = 20;
+        c.g = 30;
+        c.b = 40;
+        assert_eq!(c, Color{r:20, g:30, b:40});
     }
 }
 
