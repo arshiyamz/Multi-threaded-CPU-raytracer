@@ -61,7 +61,7 @@ fn main() -> std::io::Result<()>
     world.add(&little_sphere);
     world.add(&big_sphere);
 
-    for height_iterator in 0..RENDER_HEIGHT
+    for height_iterator in (0..RENDER_HEIGHT).rev() // reverse y since top left is -1, 1 in NDC and not -1, -1. 
     {
         for width_iterator in 0..RENDER_WIDTH
         {
