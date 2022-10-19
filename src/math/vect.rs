@@ -29,6 +29,76 @@ pub struct Vect<const COUNT: usize = 3, T: VectorableType = f64>
     pub data: [T; COUNT],
 }
 
+impl<T: VectorableType> Vect<3, T>
+{
+    pub fn new_vect(x: T, y: T, z: T) -> Self
+    {
+        Vect
+        {
+            data: [x, y, z]
+        }
+    }
+    pub fn x(&self) -> T
+    {
+        self.data[0]
+    }
+
+    pub fn y(&self) -> T
+    {
+        self.data[1]
+    }
+
+    pub fn z(&self) -> T
+    {
+        self.data[2]
+    }
+
+    pub fn get_x(&mut self) -> &mut T
+    {
+        &mut self.data[0]
+    }
+
+    pub fn get_y(&mut self) -> &mut T
+    {
+        &mut self.data[1]
+    }
+
+    pub fn get_z(&mut self) -> &mut T
+    {
+        &mut self.data[2]
+    }
+
+    pub fn r(&self) -> T
+    {
+        self.data[0]
+    }
+
+    pub fn g(&self) -> T
+    {
+        self.data[1]
+    }
+
+    pub fn b(&self) -> T
+    {
+        self.data[2]
+    }
+
+    pub fn get_r(&mut self) -> &mut T
+    {
+        &mut self.data[0]
+    }
+
+    pub fn get_g(&mut self) -> &mut T
+    {
+        &mut self.data[1]
+    }
+
+    pub fn get_b(&mut self) -> &mut T
+    {
+        &mut self.data[2]
+    }
+}
+
 impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
 {
     pub fn new() -> Self

@@ -43,6 +43,23 @@ impl Color
     }
 }
 
+pub use super::super::math::vect::Vect as FColor;
+
+impl FColor
+{
+    pub fn display_color(&self) -> String
+    {
+        format!("{} {} {}\n", (255f64 * self.r()) as u8, (255f64 * self.g()) as u8, (255f64 * self.b()) as u8)
+    }
+
+    pub fn new_color(r: f64, g: f64, b: f64) -> FColor
+    {
+        FColor {
+            data: [r, g, b]
+        }
+    }
+}
+
 //============================================
 //============================================
 //===============Unit Tests===================
