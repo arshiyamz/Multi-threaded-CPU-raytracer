@@ -459,6 +459,17 @@ mod tests
         assert_eq!(&u - &v, Vect{data:[-3f64, -3f64, -3f64]});
         assert_eq!(&v - &u, Vect{data:[3f64, 3f64, 3f64]});
 
+        let mut u1 = Vect{data:[1f64, 2f64, 3f64]};
+        let mut v1 = Vect{data:[4f64, 5f64, 6f64]};
+
+        u1 += &v1;
+
+        assert_eq!(u1, Vect{data:[5f64, 7f64, 9f64]});
+
+        u1 -= &v1;
+
+        assert_eq!(u1, Vect{data:[1f64, 2f64, 3f64]});
+
         assert_eq!(-&u, Vect{data:[-1f64, -2f64, -3f64]});
 
         assert_eq!(5f64 * &u, Vect{data:[5f64, 10f64, 15f64]});

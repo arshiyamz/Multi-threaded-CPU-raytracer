@@ -2,18 +2,6 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 
-const RENDER_WIDTH: i32 = 1280;
-const RENDER_HEIGHT: i32 = 720;
-const ASPECT_RATIO: f64 = RENDER_WIDTH as f64 / RENDER_HEIGHT as f64;
-
-const VIEWPORT_HEIGHT: f64 = 2.0;
-const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-
-const FOCAL_LENGTH: f64 = 1.0;
-
-const PROJECT_PATH: &str = env!("CARGO_MANIFEST_DIR");
-const IMAGE_OUT_PATH: &str = "out/output.ppm";
-
 mod math;
 mod utils;
 
@@ -24,7 +12,15 @@ use math::point::Point;
 use math::camera::Camera;
 use math::sphere::Sphere;
 use math::hittable::*;
+use math::random::*;
 use utils::color::FColor;
+
+const RENDER_HEIGHT: u16 = 260;
+const RENDER_WIDTH: u16 = ((RENDER_HEIGHT as f64) * ASPECT_RATIO) as u16;
+const NUM_SAMPLES: u16 = 100;
+
+const PROJECT_PATH: &str = env!("CARGO_MANIFEST_DIR");
+const IMAGE_OUT_PATH: &str = "out/output.ppm";
 
 // Background Gradient:
 
@@ -50,6 +46,8 @@ fn main() -> std::io::Result<()>
     file.write_all(format!("{} {}\n", RENDER_WIDTH, RENDER_HEIGHT).as_bytes())?;
     file.write_all(b"255\n")?;
 
+    // Setup Deterministic Random Genrator:
+    let mut rand_gen = SimpleDeterministicRandomGenerator::new();
 
     // Setup Camera:
     let camera = Camera::new();
@@ -65,16 +63,17 @@ fn main() -> std::io::Result<()>
     {
         for width_iterator in 0..RENDER_WIDTH
         {
-            let x = width_iterator as f64 / (RENDER_WIDTH - 1) as f64 - 0.5;
-            let y = height_iterator as f64 / (RENDER_HEIGHT - 1) as f64 - 0.5;
+            let mut color = FColor::new_color(0.0, 0.0, 0.0);
+            for sample_number in 0..NUM_SAMPLES
+            {
+                let u = (width_iterator as f64 + rand_gen.rand()) / (RENDER_WIDTH - 1) as f64 - 0.5;
+                let v = (height_iterator as f64 + rand_gen.rand()) / (RENDER_HEIGHT - 1) as f64 - 0.5;
 
-            let x = x * VIEWPORT_WIDTH;
-            let y = y * VIEWPORT_HEIGHT;
+                let ray = camera.get_ray(u, v);
 
-            let ray = Ray::new(&camera.origin, &(&camera.origin + &(&(x * &camera.right) + &(&(y * &camera.up) + &Vect::new_vect(0.0, 0.0, -FOCAL_LENGTH)))));
-            
-            let color = ray_color(&ray, &world);
-            file.write_all(color.display_color().as_bytes())?;
+                color += &ray_color(&ray, &world);
+            }
+            file.write_all(color.write_color(NUM_SAMPLES).as_bytes())?;
         }
     }
 

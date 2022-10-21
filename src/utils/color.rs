@@ -1,5 +1,7 @@
 use std::fmt;
 
+use super::super::math::core::*;
+
 #[derive(Debug, Default, PartialEq)]
 pub struct Color
 {
@@ -49,7 +51,7 @@ impl FColor
 {
     pub fn display_color(&self) -> String
     {
-        format!("{} {} {}\n", (255f64 * self.r()) as u8, (255f64 * self.g()) as u8, (255f64 * self.b()) as u8)
+        format!("{} {} {}\n", (256.0 * self.r()) as u8, (256.0 * self.g()) as u8, (256.0 * self.b()) as u8)
     }
 
     pub fn new_color(r: f64, g: f64, b: f64) -> FColor
@@ -57,6 +59,15 @@ impl FColor
         FColor {
             data: [r, g, b]
         }
+    }
+
+    pub fn write_color(&self, num_samples: u16) -> String
+    {
+        let r = clamp(self.r() / (num_samples as f64), 0.0, 0.999999);
+        let g = clamp(self.g() / (num_samples as f64), 0.0, 0.999999);
+        let b = clamp(self.b() / (num_samples as f64), 0.0, 0.999999);
+
+        format!("{} {} {}\n", (256.0 * r) as u8, (256.0 * g) as u8, (256.0 * b) as u8)
     }
 }
 
