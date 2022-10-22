@@ -23,7 +23,7 @@ impl VectorableType for i32 {}
 impl VectorableType for f32 {}
 impl VectorableType for f64 {}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy)]
 pub struct Vect<const COUNT: usize = 3, T: VectorableType = f64>
 {
     pub data: [T; COUNT],
@@ -31,7 +31,7 @@ pub struct Vect<const COUNT: usize = 3, T: VectorableType = f64>
 
 impl<T: VectorableType> Vect<3, T>
 {
-    pub fn new_vect(x: T, y: T, z: T) -> Self
+    pub fn make_new(x: T, y: T, z: T) -> Self
     {
         Vect
         {
@@ -106,6 +106,14 @@ impl<const COUNT: usize, T: VectorableType> Vect<COUNT, T>
         Vect::<COUNT, T>
         {
            data: [T::default(); COUNT],
+        }
+    }
+
+    pub fn reset(&mut self)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = T::default();
         }
     }
 }

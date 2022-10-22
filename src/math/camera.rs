@@ -21,9 +21,9 @@ impl Camera
     {
         Camera
         {
-            origin: Point::new_point(0.0, 0.0, 0.0),
-            right: Vect::new_vect(1.0, 0.0, 0.0),
-            up: Vect::new_vect(0.0, 1.0, 0.0)
+            origin: Point::make_new(0.0, 0.0, 0.0),
+            right: Vect::make_new(1.0, 0.0, 0.0),
+            up: Vect::make_new(0.0, 1.0, 0.0)
         }
     }
 
@@ -32,7 +32,7 @@ impl Camera
         Ray
         {
             origin: self.origin.clone(),
-            direction: &self.origin + &(&(u * Camera::VIEWPORT_WIDTH * &self.right) + &(&(v * Camera::VIEWPORT_HEIGHT * &self.up) + &Vect::new_vect(0.0, 0.0, -Camera::FOCAL_LENGTH))),
+            direction: &self.origin + &(&(u * Camera::VIEWPORT_WIDTH * &self.right) + &(&(v * Camera::VIEWPORT_HEIGHT * &self.up) + &Vect::make_new(0.0, 0.0, -Camera::FOCAL_LENGTH))),
         }
     }
 }
