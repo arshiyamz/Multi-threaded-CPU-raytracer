@@ -7,3 +7,4 @@ pub mod sphere;
 pub mod core;
 pub mod random;
 pub mod framebuffer;
+pub mod material;

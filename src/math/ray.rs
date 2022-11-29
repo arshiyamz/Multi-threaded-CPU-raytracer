@@ -4,8 +4,8 @@ use super::vect::Vect;
 #[derive(Debug, PartialEq)]
 pub struct Ray
 {
-    pub origin: Point,
-    pub direction: Vect,
+    origin: Point,
+    direction: Vect,
 }
 
 impl Ray
@@ -21,12 +21,12 @@ impl Ray
 
     pub fn new(p: &Point, d: &Vect) -> Ray
     {
-        Ray{origin: p.clone(), direction: d.clone()}
+        Ray{origin: *p, direction: d.get_normalized()}
     }
 
     pub fn make_new(p: Point, d: Vect) -> Ray
     {
-        Ray{origin: p, direction: d}
+        Ray{origin: p, direction: d.get_normalized()}
     }
 
     pub fn origin(&self) -> &Point
@@ -41,7 +41,7 @@ impl Ray
 
     pub fn at(&self, t: f64) -> Point
     {
-        &self.origin + &(t * &self.direction)
+        &self.origin + (t * &self.direction)
     }
 }
 
@@ -88,7 +88,7 @@ mod tests
     {
         let u = Vect{data:[1f64, 2f64, 3f64]};
         let v = Vect{data:[4f64, 5f64, 6f64]};
-        let r = Ray::new(&u, &v);
+        let r = Ray::make_new(u, v);
         assert_eq!(r.at(2f64), Vect{data:[9f64, 12f64, 15f64]});
     }
 }

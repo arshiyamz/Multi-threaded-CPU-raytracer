@@ -1,6 +1,10 @@
 use std::fmt;
 use std::ops::*;
 use std::convert::Into;
+use std::cmp::min_by;
+
+use super::random::*;
+use super::core::FLOAT_MARGIN_OF_ERROR;
 
 pub trait VectorableType :
     Default +
@@ -184,9 +188,51 @@ impl<'a, 'b, const COUNT: usize, T: VectorableType> Add<&'b Vect::<COUNT, T>> fo
         let mut result = Vect::<COUNT, T>::new();
         for ind in 0..COUNT
         {
-            result[ind] = self.data[ind] + other[ind];
+            result[ind] = self.data[ind] + other.data[ind];
         }
         result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Add<Vect::<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn add(self, mut other: Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            other[ind] = self.data[ind] + other.data[ind];
+        }
+        other
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Add<&'a Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn add(mut self, other: &'a Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] + other.data[ind];
+        }
+        self
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Add<Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn add(mut self, other: Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] + other.data[ind];
+        }
+        self
     }
 }
 
@@ -199,9 +245,165 @@ impl<'a, 'b, const COUNT: usize, T: VectorableType> Sub<&'b Vect::<COUNT, T>> fo
         let mut result = Vect::<COUNT, T>::new();
         for ind in 0..COUNT
         {
-            result[ind] = self.data[ind] - other[ind];
+            result[ind] = self.data[ind] - other.data[ind];
         }
         result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Sub<Vect::<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn sub(self, mut other: Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            other.data[ind] = self.data[ind] - other.data[ind];
+        }
+        other
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Sub<&'a Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn sub(mut self, other: &'a Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] - other.data[ind];
+        }
+        self
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Sub<Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn sub(mut self, other: Vect::<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] - other.data[ind];
+        }
+        self
+    }
+}
+
+impl<'a, 'b, const COUNT: usize, T: VectorableType> Mul<&'b Vect<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(self, other: &'b Vect<COUNT, T>) -> Self::Output
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result[ind] = self.data[ind] * other[ind];
+        }
+        result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Mul<Vect<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(self, mut other: Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            other.data[ind] = self.data[ind] * other.data[ind];
+        }
+        other
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Mul<&'a Vect<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(mut self, other: &'a Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] * other.data[ind];
+        }
+        self
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Mul<Vect<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(mut self, other: Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] * other.data[ind];
+        }
+        self
+    }
+}
+
+impl<'a, 'b, const COUNT: usize, T: VectorableType> Div<&'b Vect<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(self, other: &'b Vect<COUNT, T>) -> Self::Output
+    {
+        let mut result = Vect::<COUNT, T>::new();
+        for ind in 0..COUNT
+        {
+            result.data[ind] = self.data[ind] / other.data[ind];
+        }
+        result
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Div<Vect<COUNT, T>> for &'a Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(self, mut other: Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            other.data[ind] = self.data[ind] / other.data[ind];
+        }
+        other
+    }
+}
+
+impl<'a, const COUNT: usize, T: VectorableType> Div<&'a Vect<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(mut self, other: &'a Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] / other[ind];
+        }
+        self
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Div<Vect<COUNT, T>> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(mut self, other: Vect<COUNT, T>) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] / other.data[ind];
+        }
+        self
     }
 }
 
@@ -216,9 +418,31 @@ impl<'a, const COUNT: usize, T: VectorableType> AddAssign<&'a Vect::<COUNT, T>> 
     }
 }
 
+impl<const COUNT: usize, T: VectorableType> AddAssign<Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    fn add_assign(&mut self, other: Vect::<COUNT, T>)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] + other[ind];
+        }
+    }
+}
+
 impl<'a, const COUNT: usize, T: VectorableType> SubAssign<&'a Vect::<COUNT, T>> for Vect<COUNT, T>
 {
     fn sub_assign(&mut self, other: &'a Vect::<COUNT, T>)
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] - other[ind];
+        }
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> SubAssign<Vect::<COUNT, T>> for Vect<COUNT, T>
+{
+    fn sub_assign(&mut self, other: Vect::<COUNT, T>)
     {
         for ind in 0..COUNT
         {
@@ -242,6 +466,20 @@ impl<const COUNT: usize, T: VectorableType + Neg<Output = T>> Neg for &Vect<COUN
     }
 }
 
+impl<const COUNT: usize, T: VectorableType + Neg<Output = T>> Neg for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn neg(mut self) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = -self.data[ind];
+        }
+        self
+    }
+}
+
 impl<'a, const COUNT: usize, T: VectorableType> Mul<T> for &'a Vect<COUNT, T>
 {
     type Output = Vect<COUNT, T>;
@@ -257,6 +495,20 @@ impl<'a, const COUNT: usize, T: VectorableType> Mul<T> for &'a Vect<COUNT, T>
     }
 }
 
+impl<const COUNT: usize, T: VectorableType> Mul<T> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn mul(mut self, other: T) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] * other;
+        }
+        self
+    }
+}
+
 macro_rules! impl_vect_mul
 {
     ( $T:ty ) =>
@@ -266,6 +518,16 @@ macro_rules! impl_vect_mul
             type Output = Vect<COUNT, $T>;
 
             fn mul(self, other: &'a Vect<COUNT, $T>) -> Self::Output
+            {
+                other * self
+            }
+        }
+
+        impl<const COUNT: usize> Mul<Vect<COUNT, $T>> for $T
+        {
+            type Output = Vect<COUNT, $T>;
+
+            fn mul(self, other: Vect<COUNT, $T>) -> Self::Output
             {
                 other * self
             }
@@ -284,7 +546,7 @@ impl_vect_mul!(i32);
 impl_vect_mul!(f32);
 impl_vect_mul!(f64);
 
-impl<'a, const COUNT: usize, T: VectorableType> MulAssign<T> for Vect<COUNT, T>
+impl<const COUNT: usize, T: VectorableType> MulAssign<T> for Vect<COUNT, T>
 {
     fn mul_assign(&mut self, other: T)
     {
@@ -304,9 +566,23 @@ impl<'a, const COUNT: usize, T: VectorableType> Div<T> for &'a Vect<COUNT, T>
         let mut result = Vect::<COUNT, T>::new();
         for ind in 0..COUNT
         {
-            result[ind] = self.data[ind] / other;
+            result.data[ind] = self.data[ind] / other;
         }
         result
+    }
+}
+
+impl<const COUNT: usize, T: VectorableType> Div<T> for Vect<COUNT, T>
+{
+    type Output = Vect<COUNT, T>;
+
+    fn div(mut self, other: T) -> Self::Output
+    {
+        for ind in 0..COUNT
+        {
+            self.data[ind] = self.data[ind] / other;
+        }
+        self
     }
 }
 
@@ -323,9 +599,23 @@ macro_rules! impl_vect_div
                 let mut result = Vect::<COUNT, $T>::new();
                 for ind in 0..COUNT
                 {
-                    result[ind] = self / other[ind];
+                    result.data[ind] = self / other[ind];
                 }
                 result
+            }
+        }
+
+        impl<const COUNT: usize> Div<Vect<COUNT, $T>> for $T
+        {
+            type Output = Vect<COUNT, $T>;
+
+            fn div(self, mut other: Vect<COUNT, $T>) -> Self::Output
+            {
+                for ind in 0..COUNT
+                {
+                    other.data[ind] = self / other[ind];
+                }
+                other
             }
         }
     }
@@ -342,7 +632,7 @@ impl_vect_div!(i32);
 impl_vect_div!(f32);
 impl_vect_div!(f64);
 
-impl<'a, const COUNT: usize, T: VectorableType> DivAssign<T> for Vect<COUNT, T>
+impl<const COUNT: usize, T: VectorableType> DivAssign<T> for Vect<COUNT, T>
 {
     fn div_assign(&mut self, other: T)
     {
@@ -419,6 +709,95 @@ impl<T: VectorableType> Vect<3, T>
     }
 }
 
+impl Vect<3, f64>
+{
+    pub fn rand() -> Self
+    {
+        let mut rand_gen = SimpleDeterministicRandomGenerator::new();
+        Vect
+        {
+            data: [rand_gen.rand(), rand_gen.rand(), rand_gen.rand()]
+        }
+    }
+
+    pub fn rand_between(min: f64, max: f64) -> Self
+    {
+        let mut rand_gen = SimpleDeterministicRandomGenerator::new();
+        Vect
+        {
+            data: [rand_gen.rand_between(min, max), rand_gen.rand_between(min, max), rand_gen.rand_between(min, max)]
+        }
+    }
+
+    pub fn rand_in_sphere() -> Self
+    {
+        let mut p = Vect::rand_between(-1.0, 1.0);
+        loop
+        {
+            if p.length_squared() < 1.0
+            {
+                break;
+            }
+            p = Vect::rand_between(-1.0, 1.0);
+        }
+        p
+    }
+
+    pub fn sqrt(&self) -> Self
+    {
+        Vect
+        {
+            data: [self.data[0].sqrt(),
+                   self.data[1].sqrt(),
+                   self.data[2].sqrt(),]
+        }
+    }
+
+    pub fn random_unit_vect() -> Self
+    {
+        Self::rand_in_sphere().get_normalized()
+    }
+
+    pub fn random_in_hemisphere(normal: &Vect) -> Self
+    {
+        let mut result = Self::rand_in_sphere();
+        if Self::dot(&result, &normal) < 0.0
+        {
+            result = - &result;
+        }
+        result
+    }
+
+    pub fn random_in_disk(radius: f64) -> Self
+    {
+        let mut rand = SimpleDeterministicRandomGenerator::new();
+        let mut v = Self::rand_between(-1.0, 1.0);
+        *v.get_z() = 0.0;
+        v.normalize();
+        radius * v * rand.rand()
+    }
+
+    pub fn is_zero(&self) -> bool
+    {
+        self.length() < FLOAT_MARGIN_OF_ERROR
+    }
+
+    pub fn reflect(v: &Vect, u: &Vect) -> Vect
+    {
+        v - (2.0 * Vect::dot(v, u) * u)
+    }
+
+    pub fn refract(v: &Vect, normal: &Vect, etai_over_etat: f64) -> Vect
+    {
+        let normal = normal.get_normalized();
+        let v = v.get_normalized();
+        let cos_theta = min_by(Vect::dot(&-v, &normal), 1.0, |a, b| a.partial_cmp(b).unwrap());
+        let perpendicular = etai_over_etat * (v + cos_theta * normal);
+        let parallel = -(((1.0 - perpendicular.length_squared()).abs()).sqrt()) * normal;
+        perpendicular + parallel
+    }
+}
+
 //============================================
 //============================================
 //===============Unit Tests===================
@@ -456,6 +835,22 @@ mod tests
     }
 
     #[test]
+    fn refract_test()
+    {
+        let u = Vect{data:[1f64, 0f64, 0f64]};
+        let v = Vect{data:[1f64, 0f64, 0f64]};
+
+        let res = Vect{data:[-1f64, 0f64, 0f64]};
+        assert_eq!(Vect::refract(&u, &v, 1.0), res);
+
+        let u = Vect{data:[1f64, 2f64, 3f64]};
+        let v = Vect{data:[4f64, 7f64, 11f64]};
+
+        let res = Vect{data:[-0.267261f64, 0.534522f64, 0.801784f64]};
+        assert_eq!(Vect::refract(&u, &v, 8.0), res);
+    }
+
+    #[test]
     fn operations_test()
     {
         let u = Vect{data:[1f64, 2f64, 3f64]};
@@ -468,7 +863,7 @@ mod tests
         assert_eq!(&v - &u, Vect{data:[3f64, 3f64, 3f64]});
 
         let mut u1 = Vect{data:[1f64, 2f64, 3f64]};
-        let mut v1 = Vect{data:[4f64, 5f64, 6f64]};
+        let v1 = Vect{data:[4f64, 5f64, 6f64]};
 
         u1 += &v1;
 

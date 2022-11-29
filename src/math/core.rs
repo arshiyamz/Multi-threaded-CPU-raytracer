@@ -3,7 +3,9 @@
 pub const ASPECT_RATIO: f64 = 16.0 / 9.0;
 
 pub const INFINITY: f64 = f64::INFINITY;
-pub const PI: f64 = 3.14159265358979323846264338327950288f64;
+pub const PI: f64 = 3.14159265358979323846264338327950288;
+
+pub const FLOAT_MARGIN_OF_ERROR: f64 = 0.00000001;
 
 pub fn degrees_to_radians(degrees: f64) -> f64
 {
